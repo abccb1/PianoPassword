@@ -1,0 +1,155 @@
+<!DOCTYPE>
+<html>
+<head>
+  <script type='text/javascript' src="https://cdn.firebase.com/v0/firebase.js"></script>
+    <title>Piano Password</title>
+
+</head>
+<body>
+
+    <img src="img/piano_final.png" alt="" usemap="#map" />
+    <map name="map">
+        
+        <area id="C" shape="poly" coords="0, 2, 28, 2, 27, 210, 58, 211, 59, 327, 1, 327" />
+        <area id="Cs" shape="rect" coords="32, 1, 70, 208" />
+        <area id="D" shape="poly" coords="63, 327, 117, 328, 118, 209, 102, 208, 104, 2, 74, 2, 72, 213, 61, 211" />
+        <area id="Ef" shape="rect" coords="107, 3, 140, 205" />
+        <area id="E" shape="poly" coords="121, 328, 175, 327, 177, 2, 144, 3, 143, 209, 122, 208" />
+        <area id="F" shape="poly" coords="181, 2, 179, 327, 237, 328, 239, 207, 207, 207, 208, 0" />
+        <area id="Fs" shape="rect" coords="213, 2, 246, 205" />
+        <area id="G" shape="poly" coords="241, 327, 296, 327, 297, 209, 277, 208, 277, 1, 250, 2, 248, 210, 242, 211" />
+        <area id="Af" shape="rect" coords="282, 4, 314, 205" />
+        <area id="A" shape="poly" coords="300, 327, 360, 327, 359, 210, 346, 209, 347, 2, 318, 2, 316, 209, 301, 209" />
+        <area id="Bf" shape="rect" coords="352, 3, 387, 205" />
+        <area id="B" shape="poly" coords="364, 327, 418, 327, 417, 0, 391, 3, 389, 209, 363, 209" />
+
+    </map>
+    <br />
+    <button id="Yes" type="button">Done</button>
+    <button id="No" type="button">Start Over</button>
+
+    <script src="js/jquery-1.10.2.min.js"></script>
+    <script src="js/ion.sound.min.js"></script>
+    <script src="js/hash.js"></script>
+    <script>
+
+        $(document).ready(function () {
+
+            $.ionSound({
+                sounds: [               // set needed sounds names
+                    "note_g1",
+                    "note_a",
+                    "note_bf",
+                    "note_b",
+                    "note_c",
+                    "note_cs",
+                    "note_d",
+                    "note_ef",
+                    "note_e",
+                    "note_f",
+                    "note_fs",
+                    "note_g2",
+                ],
+                path: "notes/",         // set path to sounds
+                multiPlay: true,        // playing all the sounds
+                volume: "1.0"           // not so loud please
+            });
+
+            var notes = [];
+            var playedNotes;
+            var hash = "";
+
+            var add_note = function (note) {
+                console.log(note);
+                notes.push(note);
+            };
+
+            $("#A").click(function (e) {
+                $.ionSound.play("note_a");
+                add_note("A");
+            });
+            $("#Bf").click(function (e) {
+                $.ionSound.play("note_bf");
+                add_note("Bf");
+            });
+            $("#B").click(function (e) {
+                $.ionSound.play("note_b");
+                add_note("B");
+            });
+            $("#C").click(function (e) {
+                $.ionSound.play("note_c");
+                add_note("C");
+            });
+            $("#Cs").click(function (e) {
+                $.ionSound.play("note_cs");
+                add_note("Cs");
+            });
+            $("#D").click(function (e) {
+                $.ionSound.play("note_d");
+                add_note("D");
+            });
+            $("#Ef").click(function (e) {
+                $.ionSound.play("note_ef");
+                add_note("Ef");
+            });
+            $("#E").click(function (e) {
+                $.ionSound.play("note_e");
+                add_note("E");
+            });
+            $("#F").click(function (e) {
+                $.ionSound.play("note_f");
+                add_note("F");
+            });
+            $("#Fs").click(function (e) {
+                $.ionSound.play("note_fs");
+                add_note("Fs");
+            });
+            $("#G").click(function (e) {
+                $.ionSound.play("note_g2");
+                add_note("G");
+            });
+            $("#Af").click(function (e) {
+                add_note("Af");
+            });
+
+            // IF END IS CLICKED
+            // make array into a string, send off to validation land
+            $("#Yes").click(function () {
+	        var myDataRef = new Firebase('https://pianopassword.firebaseio.com/');
+	        var realPassword;
+	        var hashedpassword;
+	        var myDomain = document.domain.toString();
+                myDataRef = myDataRef.child('domains');
+                playedNotes = notes.join("");
+                console.log(playedNotes);
+                hash = hex_md5(playedNotes);
+                console.log(hash);
+                notes = [];
+                myDomain = 'somethingrandom';
+                console.log(myDomain);
+                myDataRef = myDataRef.child(myDomain);
+                myDataRef.on('value', function(snapshot) {
+                    var info = snapshot.val();
+                    if(info!=null){
+                        realPassword = info.password;
+                        hashedpassword = info.hashed;
+                        console.log(realPassword);
+                        console.log(hashedpassword);
+                    }
+                    else{ 
+                        //myDataRef = myDataRef.child(myDomain);
+                        myDataRef.set({hashed: hash, password: '12345'});
+                    }
+                
+                });
+            });
+            $("#No").click(function () {
+                notes = [];
+        
+        });
+    });
+
+    </script>
+
+</body>
+</html>
